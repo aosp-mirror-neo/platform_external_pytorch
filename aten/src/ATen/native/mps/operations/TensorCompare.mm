@@ -241,8 +241,8 @@ static void clamp_scalar_out_mps(const Tensor& input_t,
 
   @autoreleasepool {
     // the optional min/max refs could affect how we build the cached graph
-    string key = op_name + (has_min ? ("_min:" + to_string(min_scalar)) : "") +
-        (has_max ? ("_max:" + to_string(max_scalar)) : "") + "_scalar:" + getTensorsStringKey({input_t});
+    string key = op_name + (has_min ? ("_min:" + std::to_string(min_scalar)) : "") +
+        (has_max ? ("_max:" + std::to_string(max_scalar)) : "") + "_scalar:" + getTensorsStringKey({input_t});
     auto cachedGraph = LookUpOrCreateCachedGraph<CachedGraph>(key, [&](auto mpsGraph, auto newCachedGraph) {
       if (has_min)
         newCachedGraph->minTensor = [mpsGraph constantWithScalar:min_scalar
@@ -412,19 +412,6 @@ static void where_kernel_mps(TensorIterator& iter) {
   MPSDataType conditionDataType = getMPSScalarType(condition.scalar_type());
   MPSDataType selfDataType = getMPSScalarType(self.scalar_type());
   MPSDataType otherDataType = getMPSScalarType(other.scalar_type());
-  // Workaround for `selectWithPredicateTensor` on macOS Monterey where bool data type may cause a hang
-  // The issue is fixed in macOS Ventura (13.0)
-  if (!is_macos_13_or_newer()) {
-    if (condition.scalar_type() == kBool) {
-      conditionDataType = MPSDataTypeInt8;
-    }
-    if (self.scalar_type() == kBool) {
-      selfDataType = MPSDataTypeInt8;
-    }
-    if (other.scalar_type() == kBool) {
-      otherDataType = MPSDataTypeInt8;
-    }
-  }
 
   @autoreleasepool {
     string key = "where_self_out_mps:" + getTensorsStringKey({cond_bool, self, other});
@@ -459,9 +446,9 @@ static void where_kernel_mps(TensorIterator& iter) {
 }
 
 Tensor& nan_to_num_out_mps(const Tensor& self,
-                           c10::optional<double> nan,
-                           c10::optional<double> pos_inf,
-                           c10::optional<double> neg_inf,
+                           std::optional<double> nan,
+                           std::optional<double> pos_inf,
+                           std::optional<double> neg_inf,
                            Tensor& result) {
   TORCH_CHECK(self.scalar_type() == result.scalar_type(),
               "nan_to_num: dtype of out: ",
