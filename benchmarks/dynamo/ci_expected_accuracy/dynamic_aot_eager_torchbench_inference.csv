@@ -366,8 +366,8 @@ vgg16,pass,0
 
 
 
-vision_maskrcnn,pass,17
+vision_maskrcnn,pass,18
 
 
 
-yolov3,pass,2
+yolov3,pass,0
