@@ -1,7 +1,6 @@
 # mypy: allow-untyped-defs
 import logging
 import weakref
-
 from typing import Set
 
 import torch
@@ -57,7 +56,7 @@ class ModuleTracker:
     A Set containing the fqn for each module currently running their forward
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.parents = {"Global"}
         self._known_modules: weakref.WeakKeyDictionary = weakref.WeakKeyDictionary()
         self._seen_modules: weakref.WeakSet = weakref.WeakSet()

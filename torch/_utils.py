@@ -3,7 +3,6 @@ import copyreg
 import functools
 import logging
 import sys
-import threading
 import traceback
 import warnings
 from collections import defaultdict
@@ -109,16 +108,13 @@ def _get_async_or_non_blocking(function_name, non_blocking, kwargs):
     return kwargs["async"]
 
 
-_thread_local_state = threading.local()
-
-
 def _get_restore_location(device):
     """Return the map_location location.
 
     Used for rebuild functions where the tensor device is distinct from the storage
     """
 
-    map_location = getattr(_thread_local_state, "map_location", None)
+    map_location = torch.serialization._serialization_tls.map_location
     if map_location is None:
         return device
     else:
@@ -195,7 +191,13 @@ def set_tensor_metadata(tensor, metadata):
 
 
 def _rebuild_tensor_v2(
-    storage, storage_offset, size, stride, requires_grad, backward_hooks, metadata=None
+    storage,
+    storage_offset,
+    size,
+    stride,
+    requires_grad,
+    backward_hooks,
+    metadata=None,
 ):
     tensor = _rebuild_tensor(storage, storage_offset, size, stride)
     tensor.requires_grad = requires_grad
@@ -346,7 +348,14 @@ def _rebuild_meta_tensor_no_storage(dtype, size, stride, requires_grad):
 
 
 def _rebuild_wrapper_subclass(
-    cls, dtype, size, stride, storage_offset, layout, device, requires_grad
+    cls,
+    dtype,
+    size,
+    stride,
+    storage_offset,
+    layout,
+    device,
+    requires_grad,
 ):
     device = _get_restore_location(device)
     return torch.Tensor._make_wrapper_subclass(  # type: ignore[attr-defined]
@@ -762,7 +771,9 @@ def get_current_device_index() -> int:
 
 
 def _get_device_index(
-    device: Any, optional: bool = False, allow_cpu: bool = False
+    device: Any,
+    optional: bool = False,
+    allow_cpu: bool = False,
 ) -> int:
     r"""Gets the device index from :attr:`device`, which can be a torch.device
     object, a Python integer, or ``None``.
