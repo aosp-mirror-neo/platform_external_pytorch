@@ -1,19 +1,19 @@
-name: "pytorch"
-description:
-    "PyTorch is a Python package that provides two high-level features: "
-    " "
-    "Tensor computation (like NumPy) with strong GPU acceleration "
-    "Deep neural networks built on a tape-based autograd system"
+# This project was upgraded with external_updater.
+# Usage: tools/external_updater/updater.sh update external/pytorch
+# For more info, check https://cs.android.com/android/platform/superproject/main/+/main:tools/external_updater/README.md
 
+name: "pytorch"
+description: "PyTorch is a Python package that provides two high-level features:  Tensor computation (like NumPy) with strong GPU acceleration Deep neural networks built on a tape-based autograd system"
 third_party {
-homepage: "https://github.com/pytorch/pytorch/releases/tag/v2.4.1"
-  identifier {
-    type: "Archive"
-    value: "https://github.com/pytorch/pytorch"
-    primary_source: true
-    version: "v2.4.1"
-  }
-  version: "v2.4.1"
-  last_upgrade_date { year: 2024 month: 10 day: 18 }
   license_type: NOTICE
+  last_upgrade_date {
+    year: 2024
+    month: 10
+    day: 31
+  }
+  identifier {
+    type: "Git"
+    value: "https://github.com/pytorch/pytorch"
+    version: "v2.5.1"
+  }
 }
