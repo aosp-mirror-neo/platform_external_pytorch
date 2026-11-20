@@ -244,10 +244,20 @@ class SLoc:
             return f"({floc})"
 
 
-class ShapeGuard(NamedTuple):
+class _ShapeGuardFields(NamedTuple):
     expr: sympy.logic.boolalg.Boolean
     sloc: SLoc
-    size_oblivious: bool
+
+
+class ShapeGuard(_ShapeGuardFields):
+    __slots__ = ()
+
+    # Pickles from older versions carry extra trailing fields (e.g. the removed
+    # size_oblivious); accept and drop them so saved ShapeEnvs still load.
+    def __new__(
+        cls, expr: sympy.logic.boolalg.Boolean, sloc: SLoc, *_legacy: object
+    ) -> ShapeGuard:
+        return super().__new__(cls, expr, sloc)
 
 
 @dataclasses.dataclass(slots=True)
